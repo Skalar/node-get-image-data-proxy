@@ -9,7 +9,7 @@ app.use express.logger("dev")
 app.use app.router
 app.use errorHandler
 
-app.get '/', routes.checkParams, routes.getImageAndReturnBase64
+app.get '/', routes.checkAndAssignParams, routes.getImageAndReturnBase64
 
 http.createServer(app).listen app.get("port"), ->
   console.log "Express server listening on port " + app.get("port")

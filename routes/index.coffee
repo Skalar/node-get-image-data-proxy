@@ -7,7 +7,7 @@ isAcceptableContentType = (contentType) ->
   ["image/gif", "image/jpeg", "image/jpg", "image/png", "image/tiff"].indexOf contentType is not -1
 
 
-exports.checkParams = (request, response, next) ->
+exports.checkAndAssignParams = (request, response, next) ->
   if request.param('url')? and request.param('callback')
     request.imageUrl = decodeURIComponent request.param 'url'
     request.jsonpCallback = decodeURIComponent request.param 'callback'
