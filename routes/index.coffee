@@ -24,8 +24,14 @@ exports.getImageAndReturnBase64 = (request, response, next) ->
 
     if isAcceptableContentType contentType
       dataUrlHead = "data:" + contentType + ";base64,"
+
+      response.write '{"width":null,"height":null,"data":"'
+
       response.write dataUrlHead
       imgRequest.pipe(base64.encode()).pipe response
+
+      imgRequest.on 'end', ->
+        response.write '"}'
     else
       next new Error "Unexpected content type from server when fetching URL '#{request.imageUrl}'. content-type was: '#{contentType}'."
 
