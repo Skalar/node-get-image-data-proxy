@@ -2,6 +2,7 @@ httpRequest = require 'request'
 base64 = require 'base64-stream'
 CombinedStream = require 'combined-stream'
 
+dataUrlHeadFor = (contentType) -> "data:" + contentType + ";base64,"
 isAcceptableContentType = (contentType) ->
   ["image/gif", "image/jpeg", "image/jpg", "image/png", "image/tiff"].indexOf contentType is not -1
 
@@ -14,8 +15,6 @@ exports.checkParams = (request, response, next) ->
   else
     next new Error "Must have url and callback!"
 
-
-
 exports.getImageAndReturnBase64 = (request, response, next) ->
   imgRequest = httpRequest request.imageUrl
 
@@ -25,11 +24,10 @@ exports.getImageAndReturnBase64 = (request, response, next) ->
     if isAcceptableContentType contentType
       response.header 'Content-Type', 'application/javascript; charset=UTF-8'
 
-      dataUrlHead = "data:" + contentType + ";base64,"
-
       combinedStream = CombinedStream.create()
+
       combinedStream.append request.jsonpCallback + '({"width":null,"height":null,"data":"'
-      combinedStream.append dataUrlHead
+      combinedStream.append dataUrlHeadFor contentType
       combinedStream.append imgRequest.pipe(base64.encode())
       combinedStream.append '"})'
 
