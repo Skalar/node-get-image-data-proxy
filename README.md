@@ -8,3 +8,5 @@ HTTP server streams image, base64 encodes it together with the JSONP related par
 
 Could be used together with something like for instance
 https://github.com/betamax/getImageData
+
+This node app may be deployed to Heroku.
