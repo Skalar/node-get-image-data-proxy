@@ -1,5 +1,6 @@
 httpRequest = require 'request'
 base64 = require 'base64-stream'
+CombinedStream = require 'combined-stream'
 
 isAcceptableContentType = (contentType) ->
   ["image/gif", "image/jpeg", "image/jpg", "image/png", "image/tiff"].indexOf contentType is not -1
@@ -22,19 +23,17 @@ exports.getImageAndReturnBase64 = (request, response, next) ->
     contentType = imgResponse.headers["content-type"]
 
     if isAcceptableContentType contentType
-      dataUrlHead =
-
       response.header 'Content-Type', 'application/javascript; charset=UTF-8'
-      response.write request.jsonpCallback + '({"width":null,"height":null,"data":"'
 
-      response.write dataUrlHead
-      imgRequest.pipe(base64.encode()).pipe response
+      dataUrlHead = "data:" + contentType + ";base64,"
 
-      imgRequest.on 'end', ->
-        # Lucky for us that on end we can still write to the response stream.
-        # Is this actually meant to work? We need to write a closing
-        # JSON and JSONP method call to our stream.
-        response.write '"})'
+      combinedStream = CombinedStream.create()
+      combinedStream.append request.jsonpCallback + '({"width":null,"height":null,"data":"'
+      combinedStream.append dataUrlHead
+      combinedStream.append imgRequest.pipe(base64.encode())
+      combinedStream.append '"})'
+
+      combinedStream.pipe response
     else
       next new Error "Unexpected content type from server when fetching URL '#{request.imageUrl}'. content-type was: '#{contentType}'."
 

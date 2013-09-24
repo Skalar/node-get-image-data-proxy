@@ -8,6 +8,7 @@
   "dependencies": {
     "express": "3.4.0",
     "jade": "*",
-    "request": "~2.27.0"
+    "request": "~2.27.0",
+    "combined-stream": "0.0.4"
   }
 }
